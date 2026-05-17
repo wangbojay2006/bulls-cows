@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>公牛与母牛 🐂🐄</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 100%;
+            padding: 20px 15px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+
+        .rules {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .rules strong {
+            color: #667eea;
+        }
+
+        .input-section {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 0;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            text-align: center;
+            letter-spacing: 3px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            white-space: nowrap;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .history {
+            max-height: 250px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .guess-number {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            letter-spacing: 2px;
+        }
+
+        .result {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .result.bulls {
+            color: #667eea;
+        }
+
+        .result.cows {
+            color: #764ba2;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .win-message {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            animation: popIn 0.5s ease;
+        }
+
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .win-message h2 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .win-message p {
+            font-size: 14px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 12px;
+            background: #e0e0e0;
+            color: #333;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-secondary:active {
+            transform: scale(0.95);
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-bottom: 10px;
+            text-align: center;
+            min-height: 18px;
+        }
+
+        .answer-section {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .answer-btn {
+            padding: 8px 16px;
+            background: #f8f9fa;
+            color: #666;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .answer-btn:active {
+            transform: scale(0.95);
+        }
+
+        .answer-text {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 420px) {
+            .container {
+                padding: 15px 10px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .rules {
+                font-size: 11px;
+                padding: 10px;
+            }
+
+            input[type="text"] {
+                font-size: 14px;
+                padding: 10px;
+                letter-spacing: 2px;
+            }
+
+            button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+
+            .history-item {
+                padding: 8px 10px;
+            }
+
+            .guess-number {
+                font-size: 16px;
+            }
+
+            .result {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐂 公牛与母牛 🐄</h1>
+        <p class="subtitle">猜数字游戏</p>
+
+        <div class="rules">
+            <strong>游戏规则：</strong><br>
+            • 计算机会生成4位不重复数字（不以0开头）<br>
+            • 输入你的猜测，我会提示 <strong>XAYB</strong><br>
+            • <strong>A = 公牛</strong>（数字对+位置对）<br>
+            • <strong>B = 母牛</strong>（数字对但位置错）<br>
+            • <strong>可以输入重复数字</strong>（如 1122、9999）<br>
+            • 目标：用最少次数猜中！
+        </div>
+
+        <div class="input-section">
+            <input type="text" id="guessInput" placeholder="输入4位数字" maxlength="4" inputmode="numeric">
+            <button onclick="submitGuess()">猜！</button>
+        </div>
+
+        <div class="error" id="errorMsg"></div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="attempts">0</div>
+                <div class="stat-label">猜测次数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="currentBulls">0</div>
+                <div class="stat-label">🐂 公牛</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="currentCows">0</div>
+                <div class="stat-label">🐄 母牛</div>
+            </div>
+        </div>
+
+        <div class="history" id="history"></div>
+
+        <div class="answer-section">
+            <button class="answer-btn" onclick="showAnswer()">💡 查看答案</button>
+            <div class="answer-text" id="answerText"></div>
+        </div>
+
+        <div class="buttons" style="margin-top: 15px;">
+            <button class="btn-secondary" onclick="newGame()">🔄 新游戏</button>
+        </div>
+    </div>
+
+    <script>
+        let answer = [];
+        let attempts = 0;
+        let gameOver = false;
+
+        function generateAnswer() {
+            let digits = ['0','1','2','3','4','5','6','7','8','9'];
+            // 第一位不能是0
+            let first = digits.filter(d => d !== '0');
+            let firstDigit = first[Math.floor(Math.random() * first.length)];
+            digits = digits.filter(d => d !== firstDigit);
+            // 随机选择剩余3位
+            let remaining = [];
+            for (let i = 0; i < 3; i++) {
+                let idx = Math.floor(Math.random() * digits.length);
+                remaining.push(digits[idx]);
+                digits.splice(idx, 1);
+            }
+            answer = [parseInt(firstDigit), ...remaining.map(d => parseInt(d))];
+        }
+
+        function checkGuess(guess) {
+            let A = 0;
+            let B = 0;
+            
+            // 第一步：计算公牛（位置对的）
+            let answerMatched = [false, false, false, false];
+            let guessMatched = [false, false, false, false];
+            
+            for (let i = 0; i < 4; i++) {
+                if (guess[i] === answer[i]) {
+                    A++;
+                    answerMatched[i] = true;
+                    guessMatched[i] = true;
+                }
+            }
+            
+            // 第二步：计算母牛（数字对但位置不对）
+            // 统计答案中未被匹配的数字频率
+            let answerRemaining = {};
+            for (let i = 0; i < 4; i++) {
+                if (!answerMatched[i]) {
+                    let d = answer[i];
+                    answerRemaining[d] = (answerRemaining[d] || 0) + 1;
+                }
+            }
+            
+            // 统计猜测中未被匹配的数字，并计算母牛
+            for (let i = 0; i < 4; i++) {
+                if (!guessMatched[i]) {
+                    let d = guess[i];
+                    if (answerRemaining[d] && answerRemaining[d] > 0) {
+                        B++;
+                        answerRemaining[d]--;
+                    }
+                }
+            }
+            
+            return { A, B };
+        }
+
+        function submitGuess() {
+            if (gameOver) return;
+
+            let input = document.getElementById('guessInput');
+            let errorMsg = document.getElementById('errorMsg');
+            let guessStr = input.value.trim();
+
+            errorMsg.textContent = '';
+
+            // 验证输入
+            if (guessStr.length !== 4) {
+                errorMsg.textContent = '❌ 请输入恰好4位数字！';
+                return;
+            }
+            if (!/^\d+$/.test(guessStr)) {
+                errorMsg.textContent = '❌ 请输入数字！';
+                return;
+            }
+            if (guessStr[0] === '0') {
+                errorMsg.textContent = '❌ 第一位不能是0！';
+                return;
+            }
+            // 注意：允许重复数字，所以不再检查是否重复
+
+            let guess = guessStr.split('').map(d => parseInt(d));
+            attempts++;
+
+            let { A, B } = checkGuess(guess);
+
+            // 更新统计
+            document.getElementById('attempts').textContent = attempts;
+            document.getElementById('currentBulls').textContent = A;
+            document.getElementById('currentCows').textContent = B;
+
+            // 添加到历史记录
+            let history = document.getElementById('history');
+            let item = document.createElement('div');
+            item.className = 'history-item';
+            item.innerHTML = `
+                <span class="guess-number">${guessStr}</span>
+                <span class="result">
+                    <span class="bulls">${A}A</span> 
+                    <span class="cows">${B}B</span>
+                </span>
+            `;
+            history.insertBefore(item, history.firstChild);
+
+            // 清空输入框
+            input.value = '';
+
+            // 判断是否猜对
+            if (A === 4) {
+                gameOver = true;
+                showWinMessage();
+            }
+        }
+
+        function showWinMessage() {
+            let container = document.querySelector('.container');
+            let winMsg = document.createElement('div');
+            winMsg.className = 'win-message';
+            winMsg.innerHTML = `
+                <h2>🎉 恭喜你！</h2>
+                <p>答案是：<strong>${answer.join('')}</strong></p>
+                <p>你用了 <strong>${attempts}</strong> 次猜测</p>
+            `;
+            container.insertBefore(winMsg, document.querySelector('.input-section'));
+        }
+
+        function showAnswer() {
+            if (gameOver) return;
+            let answerText = document.getElementById('answerText');
+            if (answerText.textContent === '') {
+                answerText.textContent = `答案是：${answer.join('')}（游戏继续...）`;
+            } else {
+                answerText.textContent = '';
+            }
+        }
+
+        function newGame() {
+            answer = [];
+            attempts = 0;
+            gameOver = false;
+            generateAnswer();
+            document.getElementById('attempts').textContent = '0';
+            document.getElementById('currentBulls').textContent = '0';
+            document.getElementById('currentCows').textContent = '0';
+            document.getElementById('history').innerHTML = '';
+            document.getElementById('errorMsg').textContent = '';
+            document.getElementById('guessInput').value = '';
+            document.getElementById('answerText').textContent = '';
+            let winMsg = document.querySelector('.win-message');
+            if (winMsg) winMsg.remove();
+        }
+
+        // 回车键提交
+        document.getElementById('guessInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitGuess();
+            }
+        });
+
+        // 初始化游戏
+        generateAnswer();
+        console.log('答案（调试用）：', answer.join(''));
+    </script>
+</body>
+</html>
